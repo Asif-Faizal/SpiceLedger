@@ -1,0 +1,47 @@
+info:
+  name: Products with Grades
+  type: graphql
+  seq: 1
+
+graphql:
+  method: POST
+  url: "{{graphqlUrl}}"
+  body:
+    query: |
+      query GetProducts($date: String, $search: String) {
+        products(date: $date, search: $search) {
+          id
+          name
+          category
+          description
+          status
+          grades {
+            id
+            productId
+            name
+            description
+            status
+            price
+          }
+        }
+      }
+    variables: |
+      {
+        "date": "2026-06-14",
+        "search": ""
+      }
+  auth:
+    type: bearer
+    token: "{{merchantAccessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  Browse product catalog with nested grades and prices for a date.
+  Admin or merchant JWT works. Defaults to today if date omitted.
+
+  **gRPC:** ControlService.GetProductsWithGradesAndPrices

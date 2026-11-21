@@ -1,0 +1,65 @@
+info:
+  name: List Grade Transactions
+  type: graphql
+  seq: 3
+
+graphql:
+  method: POST
+  url: "{{graphqlUrl}}"
+  body:
+    query: |
+      query ListGradeTransactions(
+        $spiceGradeId: ID!
+        $skip: Int
+        $take: Int
+        $sort: String
+        $dateFrom: String
+        $dateTo: String
+      ) {
+        listGradeTransactions(
+          spiceGradeId: $spiceGradeId
+          skip: $skip
+          take: $take
+          sort: $sort
+          dateFrom: $dateFrom
+          dateTo: $dateTo
+        ) {
+          id
+          userId
+          spiceGradeId
+          type
+          quantity
+          price
+          tradeDate
+          createdAt
+        }
+      }
+    variables: |
+      {
+        "spiceGradeId": "{{gradeId}}",
+        "skip": 0,
+        "take": 10,
+        "sort": "DESC",
+        "dateFrom": null,
+        "dateTo": null
+      }
+  auth:
+    type: bearer
+    token: "{{merchantAccessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  Paginated trade history for one spice grade (merchant JWT scope).
+
+  Optional server-side filters:
+  - `sort` — `DESC` (default, newest first) or `ASC` (oldest first)
+  - `dateFrom` / `dateTo` — `YYYY-MM-DD` inclusive
+
+  Scroll pagination: `skip`/`take` (app default take=10).
+
+  **gRPC:** MarketService.ListGradeTransactions

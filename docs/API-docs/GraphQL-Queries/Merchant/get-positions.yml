@@ -1,0 +1,39 @@
+info:
+  name: Get All Positions
+  type: graphql
+  seq: 1
+
+graphql:
+  method: POST
+  url: "{{graphqlUrl}}"
+  body:
+    query: |
+      query GetPositions {
+        getPositions {
+          userId
+          spiceGradeId
+          totalQty
+          totalCost
+          avgCost
+          todayPrice
+          realizedPnL
+          unrealizedPnL
+          updatedAt
+        }
+      }
+    variables: |
+      {}
+  auth:
+    type: bearer
+    token: "{{merchantAccessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  All portfolio positions for the authenticated merchant.
+
+  **gRPC:** MarketService.GetPositions
