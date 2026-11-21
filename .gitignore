@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+
+# Secrets. Example env files stay tracked.
+**/.env
+**/.env.local
+**/.env.docker
+!**/.env.example
+!**/.env.*.example
+**/docker-compose.override.yml
+
+# Go
+*.exe
+*.test
+*.out
+vendor/
+
+# Flutter / Dart
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/.pub-cache/
+**/.pub/
+**/build/
+**/coverage/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
