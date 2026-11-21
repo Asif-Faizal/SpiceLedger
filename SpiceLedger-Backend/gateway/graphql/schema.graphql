@@ -1,0 +1,240 @@
+"""
+Exact decimal. Responses are JSON strings so values such as "0.10" are not
+rounded through IEEE-754. Inputs may be a string or a JSON number; numbers are
+accepted for older clients and are snapped at the trading boundary.
+"""
+scalar Decimal
+
+type Product {
+  id: ID!
+  name: String!
+  category: String!
+  description: String!
+  status: String!
+  grades: [Grade!]!
+}
+
+type Grade {
+  id: ID!
+  productId: ID!
+  name: String!
+  description: String!
+  status: String!
+  price: Float!
+}
+
+type DailyPrice {
+  id: ID!
+  productId: ID!
+  gradeId: ID!
+  price: Float!
+  date: String!
+  time: String!
+}
+
+type Transaction {
+  id: ID!
+  userId: ID!
+  spiceGradeId: ID!
+  type: String!
+  quantity: Decimal!
+  price: Decimal!
+  tradeDate: String!
+  createdAt: String!
+}
+
+type PositionView {
+  userId: ID!
+  spiceGradeId: ID!
+  totalQty: Decimal!
+  totalCost: Decimal!
+  avgCost: Decimal!
+  todayPrice: Decimal!
+  realizedPnL: Decimal!
+  unrealizedPnL: Decimal!
+  updatedAt: String!
+}
+
+type Query {
+  products(date: String, search: String): [Product!]!
+  getGradePosition(spiceGradeId: ID!): PositionView!
+  getPositions: [PositionView!]!
+  listGradeTransactions(spiceGradeId: ID!, skip: Int, take: Int, sort: String, dateFrom: String, dateTo: String): [Transaction!]!
+  listTransactions(skip: Int, take: Int, spiceGradeId: ID, productId: ID, sort: String, dateFrom: String, dateTo: String): [Transaction!]!
+  adminDashboard: AdminDashboard!
+  merchantDashboard(days: Int): MerchantDashboard!
+  merchantPnlTrend(days: Int): MerchantPnlTrend!
+  merchantActivityTrend(days: Int): MerchantActivityTrend!
+}
+
+type AdminDashboard {
+  totalUsers: Int!
+  totalProducts: Int!
+  totalTransactions: Int!
+  totalVolume: Decimal!
+  recentTransactions: [Transaction!]!
+  topProducts: [TopProduct!]!
+}
+
+type TopProduct {
+  name: String!
+  volume: Decimal!
+}
+
+type MerchantDashboard {
+  summary: MerchantSummary!
+  holdings: [MerchantHolding!]!
+  portfolioMix: [PortfolioSlice!]!
+  pnlTrend: [PnLPoint!]!
+  activityTrend: [ActivityDay!]!
+  recentTransactions: [Transaction!]!
+  insights: [MerchantInsight!]!
+  movers: [PriceMover!]!
+}
+
+type MerchantSummary {
+  portfolioValue: Decimal!
+  totalCost: Decimal!
+  totalRealizedPnL: Decimal!
+  totalUnrealizedPnL: Decimal!
+  netPnL: Decimal!
+  openPositions: Int!
+  totalQuantityKg: Decimal!
+  tradesInPeriod: Int!
+  buyVolumeInPeriod: Decimal!
+  sellVolumeInPeriod: Decimal!
+}
+
+type MerchantHolding {
+  spiceGradeId: ID!
+  productName: String!
+  gradeName: String!
+  quantity: Decimal!
+  avgCost: Decimal!
+  todayPrice: Decimal!
+  marketValue: Decimal!
+  costBasis: Decimal!
+  unrealizedPnL: Decimal!
+  unrealizedPnLPercent: Decimal!
+  realizedPnL: Decimal!
+  weightPercent: Decimal!
+}
+
+type PortfolioSlice {
+  label: String!
+  value: Decimal!
+  quantity: Decimal!
+}
+
+type PnLPoint {
+  date: String!
+  dailyRealizedPnL: Decimal!
+  cumulativeRealizedPnL: Decimal!
+}
+
+type ActivityDay {
+  date: String!
+  buyQuantity: Decimal!
+  sellQuantity: Decimal!
+  buyCount: Int!
+  sellCount: Int!
+}
+
+type PnLProductDay {
+  spiceGradeId: ID!
+  productName: String!
+  gradeName: String!
+  realizedPnL: Decimal!
+}
+
+type PnLDayDetail {
+  date: String!
+  dailyRealizedPnL: Decimal!
+  cumulativeRealizedPnL: Decimal!
+  products: [PnLProductDay!]!
+}
+
+type MerchantPnlTrend {
+  days: Int!
+  periodRealizedPnL: Decimal!
+  points: [PnLDayDetail!]!
+}
+
+type ActivityProductDay {
+  spiceGradeId: ID!
+  productName: String!
+  gradeName: String!
+  buyQuantity: Decimal!
+  sellQuantity: Decimal!
+  buyCount: Int!
+  sellCount: Int!
+}
+
+type ActivityDayDetail {
+  date: String!
+  buyQuantity: Decimal!
+  sellQuantity: Decimal!
+  buyCount: Int!
+  sellCount: Int!
+  products: [ActivityProductDay!]!
+}
+
+type MerchantActivityTrend {
+  days: Int!
+  totalBuyQuantity: Decimal!
+  totalSellQuantity: Decimal!
+  totalTrades: Int!
+  points: [ActivityDayDetail!]!
+}
+
+type MerchantInsight {
+  kind: String!
+  title: String!
+  body: String!
+  spiceGradeId: ID
+  severity: String!
+}
+
+type PriceMover {
+  spiceGradeId: ID!
+  productName: String!
+  gradeName: String!
+  todayPrice: Decimal!
+  previousPrice: Decimal!
+  changePercent: Decimal!
+  direction: String!
+}
+
+type Mutation {
+  createProduct(input: CreateProductInput!): Product!
+  createGrade(input: CreateGradeInput!): Grade!
+  createDailyPrice(input: CreateDailyPriceInput!): DailyPrice!
+  buy(spiceGradeId: ID!, quantity: Decimal!, price: Decimal!, tradeDate: String, idempotencyKey: String): Transaction!
+  sell(spiceGradeId: ID!, quantity: Decimal!, price: Decimal!, tradeDate: String, idempotencyKey: String): Transaction!
+}
+
+input CreateProductInput {
+  id: ID!
+  name: String!
+  category: String!
+  description: String
+  status: String
+}
+
+input CreateGradeInput {
+  id: ID!
+  productId: ID!
+  name: String!
+  description: String
+  status: String
+}
+
+
+input CreateDailyPriceInput {
+  id: ID!
+  productId: ID!
+  gradeId: ID!
+  price: Float!
+  date: String!
+  time: String!
+}

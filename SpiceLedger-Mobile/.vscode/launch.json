@@ -1,0 +1,54 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "SpiceLedger-Mobile (Dev)",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define-from-file=${workspaceFolder}/.env",
+                "--dart-define=ENVIRONMENT=development"
+            ]
+        },
+        {
+            "name": "SpiceLedger-Mobile (Android Emulator)",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define=BASIC_AUTH_USER=admin",
+                "--dart-define=BASIC_AUTH_PASS=secret123",
+                "--dart-define=BASE_URL=http://10.0.2.2:8080",
+                "--dart-define=ENVIRONMENT=development"
+            ]
+        },
+        {
+            "name": "SpiceLedger-Mobile (iOS Simulator)",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define=BASIC_AUTH_USER=admin",
+                "--dart-define=BASIC_AUTH_PASS=secret123",
+                "--dart-define=BASE_URL=http://127.0.0.1:8080",
+                "--dart-define=ENVIRONMENT=development"
+            ]
+        },
+        {
+            "name": "SpiceLedger-Mobile (Test)",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define-from-file=${workspaceFolder}/.env",
+                "--dart-define=ENVIRONMENT=testing"
+            ]
+        },
+        {
+            "name": "SpiceLedger-Mobile (Prod)",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define-from-file=${workspaceFolder}/.env",
+                "--dart-define=ENVIRONMENT=production"
+            ]
+        }
+    ]
+}

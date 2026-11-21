@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Control (gRPC)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/control/cmd/control/main.go",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "name": "Market (gRPC)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/market/cmd/market/main.go",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "name": "Gateway (REST + GraphQL)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/gateway/cmd/gateway/main.go",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Full Stack (local)",
+            "configurations": [
+                "Control (gRPC)",
+                "Market (gRPC)",
+                "Gateway (REST + GraphQL)"
+            ],
+            "stopAll": true
+        }
+    ]
+}

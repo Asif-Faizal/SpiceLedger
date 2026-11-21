@@ -1,0 +1,17 @@
+schema: schema.graphql
+
+exec:
+  filename: generated.go
+  package: graphql
+
+models:
+  Decimal:
+    model: github.com/Asif-Faizal/SpiceLedger-Backend/gateway/graphql.Decimal
+  Product:
+    model: github.com/Asif-Faizal/SpiceLedger-Backend/gateway/graphql.ProductWithGradesAndPrice
+  Grade:
+    model: github.com/Asif-Faizal/SpiceLedger-Backend/gateway/graphql.GradeWithPrice
+  Transaction:
+    model: github.com/Asif-Faizal/SpiceLedger-Backend/gateway/graphql.Transaction
+  PositionView:
+    model: github.com/Asif-Faizal/SpiceLedger-Backend/gateway/graphql.PositionView

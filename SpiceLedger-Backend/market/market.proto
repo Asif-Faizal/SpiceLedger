@@ -1,0 +1,255 @@
+// protoc --go_out=./pb --go-grpc_out=./pb market.proto
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./pb";
+
+message Transaction {
+  string id = 1;
+  string user_id = 2;
+  string spice_grade_id = 3;
+  string type = 4;
+  double quantity = 5 [deprecated = true]; // legacy IEEE-754; prefer quantity_decimal
+  double price = 6 [deprecated = true]; // legacy IEEE-754; prefer price_decimal
+  string trade_date = 7; // YYYY-MM-DD
+  string created_at = 8; // YYYY-MM-DD HH:MM:SS
+  string quantity_decimal = 9; // exact decimal string
+  string price_decimal = 10; // exact decimal string
+}
+
+message PositionView {
+  string user_id = 1;
+  string spice_grade_id = 2;
+  double total_qty = 3;
+  double total_cost = 4;
+  double avg_cost = 5;
+  double today_price = 6;
+  double realized_pnl = 7;
+  double unrealized_pnl = 8;
+  string updated_at = 9;
+  string total_qty_decimal = 10;
+  string total_cost_decimal = 11;
+  string avg_cost_decimal = 12;
+  string today_price_decimal = 13;
+  string realized_pnl_decimal = 14;
+  string unrealized_pnl_decimal = 15;
+}
+
+message BuyRequest {
+  string user_id = 1;
+  string spice_grade_id = 2;
+  double quantity = 3 [deprecated = true]; // legacy IEEE-754; prefer quantity_decimal
+  double price = 4 [deprecated = true]; // legacy IEEE-754; prefer price_decimal
+  string trade_date = 5; // YYYY-MM-DD
+  string quantity_decimal = 6; // exact decimal string
+  string price_decimal = 7; // exact decimal string
+  string idempotency_key = 8; // client-supplied retry key; empty disables idempotency
+}
+
+message BuyResponse {
+  Transaction transaction = 1;
+}
+
+message SellRequest {
+  string user_id = 1;
+  string spice_grade_id = 2;
+  double quantity = 3 [deprecated = true]; // legacy IEEE-754; prefer quantity_decimal
+  double price = 4 [deprecated = true]; // legacy IEEE-754; prefer price_decimal
+  string trade_date = 5; // YYYY-MM-DD
+  string quantity_decimal = 6;
+  string price_decimal = 7;
+  string idempotency_key = 8;
+}
+
+message SellResponse {
+  Transaction transaction = 1;
+}
+
+message GetGradePositionRequest {
+  string user_id = 1;
+  string spice_grade_id = 2;
+}
+
+message GetGradePositionResponse {
+  PositionView position = 1;
+}
+
+message GetPositionsRequest {
+  string user_id = 1;
+}
+
+message GetPositionsResponse {
+  repeated PositionView positions = 1;
+}
+
+message ListGradeTransactionsRequest {
+  string user_id = 1;
+  string spice_grade_id = 2;
+  uint32 skip = 3;
+  uint32 take = 4;
+  string sort = 5; // ASC | DESC (default DESC)
+  string date_from = 6; // YYYY-MM-DD optional
+  string date_to = 7; // YYYY-MM-DD optional
+}
+
+message ListGradeTransactionsResponse {
+  repeated Transaction transactions = 1;
+}
+
+message ListTransactionsRequest {
+  string user_id = 1;
+  uint32 skip = 2;
+  uint32 take = 3;
+  string spice_grade_id = 4; // optional single grade
+  repeated string spice_grade_ids = 5; // optional product grade set
+  string sort = 6; // ASC | DESC (default DESC)
+  string date_from = 7; // YYYY-MM-DD optional
+  string date_to = 8; // YYYY-MM-DD optional
+}
+
+message ListTransactionsResponse {
+  repeated Transaction transactions = 1;
+}
+
+message GetMarketMetricsRequest {}
+
+message GetMarketMetricsResponse {
+  uint32 total_transactions = 1;
+  double total_volume = 2 [deprecated = true];
+  message TopProduct {
+    string product_name = 1;
+    string grade_name = 2;
+    double volume = 3 [deprecated = true];
+    string volume_decimal = 4;
+  }
+  repeated TopProduct top_products = 3;
+  string total_volume_decimal = 4;
+}
+
+// Portfolio analytics (JWT-scoped; orchestrated by GraphQL like adminDashboard).
+
+message EnrichedHolding {
+  string spice_grade_id = 1;
+  string product_name = 2;
+  string grade_name = 3;
+  double quantity = 4 [deprecated = true];
+  double total_cost = 5 [deprecated = true];
+  double realized_pnl = 6 [deprecated = true];
+  double today_price = 7 [deprecated = true];
+  string quantity_decimal = 8;
+  string total_cost_decimal = 9;
+  string realized_pnl_decimal = 10;
+  string today_price_decimal = 11;
+}
+
+message GetHoldingsRequest {
+  string user_id = 1;
+}
+
+message GetHoldingsResponse {
+  repeated EnrichedHolding holdings = 1;
+}
+
+message RealizedPnLRow {
+  string date = 1; // YYYY-MM-DD
+  double amount = 2 [deprecated = true];
+  string spice_grade_id = 3;
+  string product_name = 4;
+  string grade_name = 5;
+  string amount_decimal = 6;
+}
+
+message GetRealizedPnLHistoryRequest {
+  string user_id = 1;
+  uint32 days = 2;
+}
+
+message GetRealizedPnLHistoryResponse {
+  repeated RealizedPnLRow rows = 1;
+}
+
+message TradeActivityRow {
+  string date = 1; // YYYY-MM-DD
+  string type = 2; // BUY or SELL
+  double quantity = 3 [deprecated = true];
+  uint32 count = 4;
+  string spice_grade_id = 5;
+  string product_name = 6;
+  string grade_name = 7;
+  string quantity_decimal = 8;
+}
+
+message GetTradeActivityRequest {
+  string user_id = 1;
+  uint32 days = 2;
+}
+
+message GetTradeActivityResponse {
+  repeated TradeActivityRow rows = 1;
+}
+
+message GetTradeStatsRequest {
+  string user_id = 1;
+  uint32 days = 2;
+}
+
+message GetTradeStatsResponse {
+  uint32 trades_in_period = 1;
+  double buy_volume_in_period = 2 [deprecated = true];
+  double sell_volume_in_period = 3 [deprecated = true];
+  string buy_volume_decimal = 4;
+  string sell_volume_decimal = 5;
+}
+
+message PriceSnapshot {
+  string spice_grade_id = 1;
+  string product_name = 2;
+  string grade_name = 3;
+  double today_price = 4 [deprecated = true];
+  double previous_price = 5 [deprecated = true];
+  string today_price_decimal = 6;
+  string previous_price_decimal = 7;
+}
+
+message GetPriceSnapshotsRequest {
+  string user_id = 1;
+}
+
+message GetPriceSnapshotsResponse {
+  repeated PriceSnapshot snapshots = 1;
+}
+
+message InventoryDiscrepancy {
+  string user_id = 1;
+  string spice_grade_id = 2;
+  string kind = 3;
+  string position_qty = 4;
+  string lot_qty = 5;
+  string position_cost = 6;
+  string lot_cost = 7;
+  string detail = 8;
+}
+
+message ReconcileInventoryRequest {}
+
+message ReconcileInventoryResponse {
+  repeated InventoryDiscrepancy discrepancies = 1;
+}
+
+service MarketService {
+  rpc Buy(BuyRequest) returns (BuyResponse);
+  rpc Sell(SellRequest) returns (SellResponse);
+  rpc GetGradePosition(GetGradePositionRequest) returns (GetGradePositionResponse);
+  rpc GetPositions(GetPositionsRequest) returns (GetPositionsResponse);
+  rpc ListGradeTransactions(ListGradeTransactionsRequest) returns (ListGradeTransactionsResponse);
+  rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse);
+  rpc GetMarketMetrics(GetMarketMetricsRequest) returns (GetMarketMetricsResponse);
+  rpc GetHoldings(GetHoldingsRequest) returns (GetHoldingsResponse);
+  rpc GetRealizedPnLHistory(GetRealizedPnLHistoryRequest) returns (GetRealizedPnLHistoryResponse);
+  rpc GetTradeActivity(GetTradeActivityRequest) returns (GetTradeActivityResponse);
+  rpc GetTradeStats(GetTradeStatsRequest) returns (GetTradeStatsResponse);
+  rpc GetPriceSnapshots(GetPriceSnapshotsRequest) returns (GetPriceSnapshotsResponse);
+  // ReconcileInventory is read-only and admin-only. It never rewrites positions.
+  rpc ReconcileInventory(ReconcileInventoryRequest) returns (ReconcileInventoryResponse);
+}
